@@ -1,0 +1,11 @@
+﻿  main.cpp
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(134): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(156): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(271): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(277): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(368): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(372): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(435): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(438): warning C4244: "Argument": Konvertierung von "double" in "int", möglicher Datenverlust
+C:\Users\Flo\source\repos\hashing\hashing\main.cpp(302): warning C4715: "insert_key_quad": Nicht alle Codepfade geben einen Wert zurück.
+  hashing.vcxproj -> C:\Users\Flo\source\repos\hashing\Debug\hashing.exe
