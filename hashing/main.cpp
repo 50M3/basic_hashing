@@ -3,7 +3,7 @@
 //  Author:     Florian Liehr
 //  Datum:      07.05.2019
 //  Uhrzeit:    21:14
-//  Beschreib.: Implementiert wichtige Funktionen für Hashing
+//  Beschreib.: Implementiert wichtige Funktionen fÃ¼r Hashing
 //  ***********************************************************************************************************
 #include <iostream>
 #include <iomanip>
@@ -26,23 +26,11 @@ int clusterAmount();
 void delete_key(int data);
 void delete_key_quad(int data);
 void print_hashtable();
-void print_hashtable_quad();
 
 int getHash(int data);
 
 using namespace std;
 
-
-/*
- * typedef struct bucket
- *  Erstellt die Struktur bucket
- *	welche aus der Data und dem State besteht
- *
- * */
-typedef struct bucket {
-	int data;
-	int state; // 0 = frei, -1 = belegt, -2 = entfernt
-}bucket;
 
 /* 
  * typedef struct anzahl
@@ -55,18 +43,13 @@ typedef struct anzahl {
 	int64_t erfolglos = 0;
 }anzahl;
 
-bucket* hashtable[TABLE_SIZE];
-bucket* hashtable_quad[TABLE_SIZE];
+int hashtable[TABLE_SIZE];
 anzahl zaehler;
 
 
 int main() {
 	for (int i = 0; i < TABLE_SIZE; i++) {
-		hashtable[i] = new bucket{ 0, FREI };
-	}
-
-	for (int i = 0; i < TABLE_SIZE; i++) {
-		hashtable_quad[i] = new  bucket{ 0, FREI };
+		hashtable[i] = FREI;
 	}
 
 	int* randomValues;
@@ -78,8 +61,7 @@ int main() {
 			if (system("CLS")) system("clear");
 
 			cout << "************************************" << endl;
-			print_hashtable();
-			print_hashtable_quad();
+			//print_hashtable();
 			cout << "0 -> Element in Hashtabelle einfuegen" << endl;
 			cout << "1 -> Element in Hashtabelle suchen" << endl;
 			cout << "2 -> Element in Hashtabelle QUAD einfuegen" << endl;
@@ -128,10 +110,8 @@ int main() {
 				exit(EXIT_SUCCESS);
 
 			case 4:
-				cout << "-Testroutine für Quad wird ausgefuehrt!" << endl;
+				cout << "-Testroutine fÃ¼r Quad wird ausgefuehrt!" << endl;
 				
-
-				srand(time(NULL));
 
 				for (int i = 0; i < MAX_HASH; i++) {
 					randomValues[i] = (rand() << 15) + rand();
@@ -146,14 +126,14 @@ int main() {
 					zaehler.erfolglos += search_key_quad(j * -1);
 				}
 
-				/*for (int j = 0; j < MAX_HASH; j++) {
+				for (int j = 0; j < MAX_HASH; j++) {
 					delete_key_quad(randomValues[j]);
-				}*/
+				}
 				break;
 
 			case 5:
 
-				srand(time(NULL));
+				srand(time(nullptr));
 
 				cout << "-Testroutine wird ausgefuehrt!" << endl;
 
@@ -170,6 +150,10 @@ int main() {
 				for (int j = 0; j < TABLE_SIZE; j++) {
 					zaehler.erfolglos += search_key(j * -1);
 				}
+
+				/*for (int j = 0; j < MAX_HASH; j++) {
+					delete_key(randomValues[j]);
+				}*/
 				
 				char file[16] = "pdf.csv";
 				CSVWriter writer(file, 1, 3);
@@ -196,19 +180,18 @@ int main() {
  *  Fuegt ein Element nach linearem Sondieren in die Liste ein!
  *
  * Parameterliste:
- *  int data: Der Key der eingefügt werden soll.
+ *  int data: Der Key der eingefÃ¼gt werden soll.
  *
- * Rückgabeparameter:
+ * RÃ¼ckgabeparameter:
  *  @hash = Der gehashte Key
  *
  * */
 int insert_key(int data) {
 	int hash = getHash(data);
 
-	// BUCKET LEER, FÜGE EIN
-	if (hashtable[hash]->state == FREI) {
-		hashtable[hash]->state = BELEGT;
-		hashtable[hash]->data = data;
+	// BUCKET LEER, FÃœGE EIN
+	if (hashtable[hash] == FREI) {
+		hashtable[hash] = data;
 	}
 
 	else {
@@ -219,7 +202,7 @@ int insert_key(int data) {
 		// OVERFLOW FIX
 		if (hash + i >= TABLE_SIZE)
 			i = hash * -1;
-		while (hashtable[hash + i]->state != FREI && i != 0) {
+		while (hashtable[hash + i] != FREI && i != 0) {
 			i++;
 
 			// OVERFLOW FIX
@@ -227,10 +210,9 @@ int insert_key(int data) {
 				i = hash * -1;
 		}
 
-		// BUCKET IST LEER, FÜGE EIN
-		if (hashtable[hash + i]->state == FREI) {
-			hashtable[hash + i]->state = BELEGT;
-			hashtable[hash + i]->data = data;
+		// BUCKET IST LEER, FÃœGE EIN
+		if (hashtable[hash + i] == FREI) {
+			hashtable[hash + i] = data;
 		}
 
 		// ALLE SLOTS SIND VOLL!
@@ -238,7 +220,7 @@ int insert_key(int data) {
 			throw "Hashtabelle ist voll! [insert_key]";
 		}
 	}
-		return hash;
+	return hash;
 }
 
 /*
@@ -246,9 +228,9 @@ int insert_key(int data) {
  *  Fuegt ein Element nach quadratischem Sondieren in die Liste ein!
  *
  * Parameterliste:
- *  int data: Der Key der eingefügt werden soll.
+ *  int data: Der Key der eingefÃ¼gt werden soll.
  *
- * Rückgabeparameter:
+ * RÃ¼ckgabeparameter:
  *  @hash = Der gehashte Key
  *
  * */
@@ -258,10 +240,9 @@ int insert_key(int data) {
 int insert_key_quad(int data) {
 	int hash = getHash(data);
 
-	// SLOT FREI, FÜGE EIN
-	if (hashtable_quad[hash]->state == FREI) {
-		hashtable_quad[hash]->data = data;
-		hashtable_quad[hash]->state = BELEGT;
+	// SLOT FREI, FÃœGE EIN
+	if (hashtable[hash] == FREI) {
+		hashtable[hash] = data;
 	}
 
 	else {
@@ -270,22 +251,20 @@ int insert_key_quad(int data) {
 		// GENERIERE EINEN NEUEN BUCKET
 		int new_position = getHash(hash + pow(i / 2, 2) * pow(-1, i));
 
-		// ÜBERPRÜFE OB NEUER BUCKET BELEGT
-		while (hashtable_quad[new_position]->state != FREI && i < TABLE_SIZE) {
+		// ÃœBERPRÃœFE OB NEUER BUCKET BELEGT
+		while (hashtable[new_position] != FREI && i < TABLE_SIZE) {
 			// NEUEN BUCKET SUCHEN
 			i++;
 			new_position = getHash(hash + pow(i / 2, 2) * pow(-1, i));
 		}
 		
-		// NEUER BUCKET IST FREI, FÜGE EIN
-		if (hashtable_quad[new_position]->state == FREI) {
-			hashtable_quad[new_position]->data = data;
-			hashtable_quad[new_position]->state = BELEGT;
+		// NEUER BUCKET IST FREI, FÃœGE EIN
+		if (hashtable[new_position] == FREI) {
+			hashtable[new_position] = data;
 		}
-		// NEUER BUCKET IST FREI, WAR ABER VORHER GEFÜLLT
-		else if(hashtable_quad[new_position]->state == ENTFERNT){
-			hashtable_quad[new_position]->data = data;
-			hashtable_quad[new_position]->state = BELEGT;
+		// NEUER BUCKET IST FREI, WAR ABER VORHER GEFÃœLLT
+		else if(hashtable[new_position] == ENTFERNT){
+			hashtable[new_position] = data;
 		}
 
 		// INSERT AN EINER STELLE DIE ES NICHT GIBT
@@ -302,13 +281,13 @@ int insert_key_quad(int data) {
 }
 /*
  * int search_key(int data)
- *  Sucht einen Key in der Liste und vergleich in jedem Behälter die Schlüssel!
+ *  Sucht einen Key in der Liste und vergleich in jedem BehÃ¤lter die SchlÃ¼ssel!
  *
  * Parameterliste:
- *  int data: Der Key der eingefügt werden soll.
+ *  int data: Der Key der eingefÃ¼gt werden soll.
  *
- * Rückgabeparameter:
- *  @count = RÜCKGABE DER GEZÄHLTEN VERGLEICHE
+ * RÃ¼ckgabeparameter:
+ *  @count = RÃœCKGABE DER GEZÃ„HLTEN VERGLEICHE
  *
  * */
 
@@ -317,12 +296,12 @@ int search_key(int data) {
 
 
 	// BUCKET FREI
-	if (hashtable[hash]->state == FREI) {
+	if (hashtable[hash] == FREI) {
 		return 0;
 	}
 
 	// BUCKET INHALT = GESUCHTER DATA
-	if (hashtable[hash]->data == data) {
+	if (hashtable[hash] == data) {
 		return count;
 	}
 
@@ -337,7 +316,7 @@ int search_key(int data) {
 		}
 
 		// SOLANGE SUCHEN BIS BUCKET DATA = GESUCHTER DATA
-		while (hashtable[hash + i]->data != data && i != 0 && hashtable[hash + i]->state != FREI) {
+		while (hashtable[hash + i] != data && i != 0 && hashtable[hash + i] != FREI) {
 			i++;
 			count++;
 
@@ -356,23 +335,23 @@ int search_key(int data) {
 int search_key_quad(int data) {
 	int count = 1, hash = getHash(data), i = 1;
 
-	if (hashtable_quad[hash]->state == FREI) {
+	if (hashtable[hash] == FREI) {
 		return 0;
 	}
 
-	if (hashtable_quad[hash]->data == data) {
+	if (hashtable[hash] == data) {
 		return count;
 	}
 	else {
 		count++;
 		int new_position = getHash(hash + pow(i / 2, 2) * pow(-1, i));
-		while (hashtable_quad[new_position]->data != data && i < TABLE_SIZE && hashtable_quad[new_position]->state != FREI) {
+		while (hashtable[new_position] != data && i < TABLE_SIZE && hashtable[new_position] != FREI) {
 			i++;
 			count++;
 			new_position = getHash(hash + pow(i / 2, 2) * pow(-1, i));
 		}
 
-		if (hashtable_quad[new_position]->data == data) {
+		if (hashtable[new_position] == data) {
 			return count;
 		}
 		else {
@@ -384,28 +363,27 @@ int search_key_quad(int data) {
 
 /*
  * void delete_key(int data)
- *  Sucht und löscht das Element data
+ *  Sucht und lÃ¶scht das Element data
  *
  * Parameterliste:
- *  int data: Die zu suchende und löschende Data
+ *  int data: Die zu suchende und lÃ¶schende Data
  *
- * Rückgabeparameter:
+ * RÃ¼ckgabeparameter:
  *  void
  *
  * */
 void delete_key(int data) {
 	int hash = getHash(data);
 
-	// BUCKET DATA GEFUNDEN, LÖSCHE DATA, SETZE STATE
-	if (hashtable[hash]->data == data) {
-		hashtable[hash]->data = 0;
-		hashtable[hash]->state = ENTFERNT;
+	// BUCKET DATA GEFUNDEN, LÃ–SCHE DATA, SETZE STATE
+	if (hashtable[hash] == data) {
+		hashtable[hash] = ENTFERNT;
 	}
 
 	else {
 		// BUCKET DATA NICHT GEFUNDEN, SUCHE DATA
 		int i = 1;
-		while (hashtable[hash]->data != data && i != 0) {
+		while (hashtable[hash+i] != data && i != 0) {
 			i++;
 
 			// OVERFLOW FIX
@@ -414,10 +392,9 @@ void delete_key(int data) {
 			}
 		}
 
-		// DATA GEFUNDEN, LÖSCHE DATA, SETZE STATE
-		if (hashtable[hash + i]->data == data) {
-			hashtable[hash + i]->data = 0;
-			hashtable[hash + i]->state = ENTFERNT;
+		// DATA GEFUNDEN, LÃ–SCHE DATA, SETZE STATE
+		if (hashtable[hash + i] == data) {
+			hashtable[hash + i] = ENTFERNT;
 		}
 	}
 }
@@ -425,21 +402,19 @@ void delete_key(int data) {
 void delete_key_quad(int data) {
 	int hash = getHash(data);
 
-	if (hashtable_quad[hash]->data == data) {
-		hashtable_quad[hash]->data = 0;
-		hashtable_quad[hash]->state = ENTFERNT;
+	if (hashtable[hash] == data) {
+		hashtable[hash] = ENTFERNT;
 	}
 
 	else {
 		int i = 2;
 		int new_position = getHash(hash + pow(i / 2, 2) * pow(-1, i));
-		while (hashtable_quad[new_position]->data != data && i != 0) {
+		while (hashtable[new_position] != data && i != 0) {
 			i++;
 			new_position = getHash(hash + pow(i / 2, 2) * pow(-1, i));
 		}
-		if (hashtable_quad[new_position]->data == data) {
-			hashtable_quad[new_position]->data = 0;
-			hashtable_quad[new_position]->state = ENTFERNT;
+		if (hashtable[new_position] == data) {
+			hashtable[new_position] = ENTFERNT;
 		}
 	}
 }
@@ -447,9 +422,9 @@ void delete_key_quad(int data) {
 
 /*
  * int biggestClusterSize()
- *  Wie groß das größte Cluster ist!
+ *  Wie groÃŸ das grÃ¶ÃŸte Cluster ist!
  *
- * Rückgabeparameter:
+ * RÃ¼ckgabeparameter:
  *  @ count > max = return count
  *  @ max = return max;
  *
@@ -458,7 +433,7 @@ int biggestClusterSize() {
 	int count = 0, max = 0;
 
 	for (int i = 0; i < TABLE_SIZE; i++) {
-		if (hashtable[i]->state != FREI && hashtable[i]->state != ENTFERNT) {
+		if (hashtable[i] != FREI && hashtable[i] != ENTFERNT) {
 			count++;
 		}
 		else {
@@ -474,9 +449,9 @@ int biggestClusterSize() {
 
 /*
  * int clusterAmount()
- *  Zählt die Cluster in der Hashtabelle!
+ *  ZÃ¤hlt die Cluster in der Hashtabelle!
  *
- * Rückgabeparameter:
+ * RÃ¼ckgabeparameter:
  *  @count = Anzahl der Cluster!
  *
  * */
@@ -485,7 +460,7 @@ int clusterAmount() {
 	bool found = false;
 
 	for (int i = 0; i < TABLE_SIZE; i++) {
-		if (hashtable[i]->state != FREI && hashtable[i]->state != ENTFERNT) {
+		if (hashtable[i] != FREI && hashtable[i] != ENTFERNT) {
 			if (!found) {
 				found = true;
 				count++;
@@ -501,13 +476,13 @@ int clusterAmount() {
 
 /*
  * int getHash(int data)
- *  Gehashter Key mit Modulo von Wikipedia für -a mod m!
+ *  Gehashter Key mit Modulo von Wikipedia fÃ¼r -a mod m!
  *
  * Parameterliste:
  *  int data: Der Key der gehasht wird.
  *
- * Rückgabeparameter:
- *  @calc Der gehashte Schlüssel 
+ * RÃ¼ckgabeparameter:
+ *  @calc Der gehashte SchlÃ¼ssel 
  *
  * */
 int getHash(int data) {
@@ -521,19 +496,8 @@ int getHash(int data) {
 void print_hashtable() {
 	cout << "------------------------------------" << endl;
 	for (int i = 0; i < TABLE_SIZE; i++) {
-		cout << setw(3) << i << " Memory " << hashtable[i] << " -> "
-			<< setw(5) << hashtable[i]->data << " -> "
-			<< hashtable[i]->state << endl;
-	}
-	cout << "------------------------------------" << endl;
-}
-
-void print_hashtable_quad() {
-	cout << "------------------------------------" << endl;
-	for (int i = 0; i < TABLE_SIZE; i++) {
-		cout << setw(3) << i << " Memory " << hashtable_quad[i] << " -> "
-			<< setw(5) << hashtable_quad[i]->data << " -> "
-			<< hashtable_quad[i]->state << endl;
+		cout << setw(3) << i << " Memory " << hashtable[i]
+			<< endl;
 	}
 	cout << "------------------------------------" << endl;
 }
